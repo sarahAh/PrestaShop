@@ -340,8 +340,17 @@ class CartRuleCore extends ObjectModel
 					WHERE `id_customer` = '.(int)$id_customer.'
 					AND `deleted` = 0'
 				);
-
-				if (is_array($countries) && count($countries))
+				if(Context::getContext()->cart->id_address_delivery != 0){
+					$address_cart = new Address(Context::getContext()->cart->id_address_delivery);
+					$id_cart_rule = (bool)Db::getInstance()->getValue('
+							SELECT crc.id_cart_rule
+							FROM '._DB_PREFIX_.'cart_rule_country crc
+							WHERE crc.id_cart_rule = '.(int)$cart_rule['id_cart_rule'].'
+							AND crc.id_country = '.$address_cart->id_country);
+					if (!$id_cart_rule)
+						unset($result[$key]);
+				}
+				elseif (is_array($countries) && count($countries))
 					foreach ($countries as $country)
 					{
 						$id_cart_rule = (bool)Db::getInstance()->getValue('
